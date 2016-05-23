@@ -2,12 +2,12 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="res"/>
-	<classpathentry kind="lib" path="C:/Users/Kyran Adams/Desktop/lwjgl/jar/lwjgl.jar" sourcepath="C:/Users/Kyran Adams/Desktop/lwjgl/src.zip">
+	<classpathentry kind="lib" path="C:/Users/s-kadams/Desktop/jar/lwjgl.jar" sourcepath="C:/Users/Kyran Adams/Desktop/lwjgl/src.zip">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/C:/Users/Kyran%20Adams/Desktop/lwjgl/doc/javadoc.zip!/"/>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Users/Kyran Adams/Desktop/lwjgl/native"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Users/s-kadams/Desktop/native"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre1.8.0_77"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

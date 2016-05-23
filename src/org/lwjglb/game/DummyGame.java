@@ -5,7 +5,6 @@ import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjglb.game.engine.Camera;
 import org.lwjglb.game.engine.IGameLogic;
-import org.lwjglb.game.engine.Mesh;
 import org.lwjglb.game.engine.MouseInput;
 import org.lwjglb.game.engine.Window;
 
@@ -20,23 +19,27 @@ public class DummyGame implements IGameLogic {
 	@Override
 	public void init(Window window) throws Exception {
 		renderer.init(window);
-		float[] positions = new float[] { 
-				-0.5f, 0.5f, -1.05f,  // front left up
-				-0.5f, -0.5f, -1.05f, // front left down
-				0.5f, -0.5f, -1.05f, // front right down
-				0.5f, 0.5f,	-1.05f,  // front right up
-				-0.5f, 0.5f, -2.05f,  // back left up
-				-0.5f, -0.5f, -2.05f, // back left down
-				0.5f, -0.5f, -2.05f, // back right down
-				0.5f, 0.5f,	-2.05f,  // back right up
-		};
-		int[] indices = new int[] { 
-				0, 1, 3, 3, 1, 2, // front face
-				0, 4, 1, 1, 5, 4, // left face
-				3, 2, 6, 6, 3, 7,
-				};
-		float[] colors = new float[] { 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, 0.5f, };
-		models = new GameModel[] { new GameModel(new Mesh(positions, colors, indices)) };
+//		float[] positions = new float[] { 
+//				-0.5f, 0.5f, -1.05f,  // front left up
+//				-0.5f, -0.5f, -1.05f, // front left down
+//				0.5f, -0.5f, -1.05f, // front right down
+//				0.5f, 0.5f,	-1.05f,  // front right up
+//				-0.5f, 0.5f, -2.05f,  // back left up
+//				-0.5f, -0.5f, -2.05f, // back left down
+//				0.5f, -0.5f, -2.05f, // back right down
+//				0.5f, 0.5f,	-2.05f,  // back right up
+//		};
+//		int[] indices = new int[] { 
+//				0, 1, 3, 3, 1, 2, // front face
+//				0, 4, 1, 1, 5, 4, // left face
+//				3, 2, 6, 6, 3, 7,
+//				};
+//		float[] colors = new float[] { 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, 0.5f, };
+		
+		
+		HeightMap heightMap = new HeightMap(0.0f, 0.1f, 0.70f, 40, 40);
+		heightMap.setScale(10);
+		models = new GameModel[] { heightMap };
 	}
 
 	@Override
