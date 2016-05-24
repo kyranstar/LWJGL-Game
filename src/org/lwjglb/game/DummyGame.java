@@ -3,9 +3,11 @@ package org.lwjglb.game;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL11;
 import org.lwjglb.game.engine.Camera;
 import org.lwjglb.game.engine.IGameLogic;
 import org.lwjglb.game.engine.MouseInput;
+import org.lwjglb.game.engine.OBJLoader;
 import org.lwjglb.game.engine.Window;
 
 public class DummyGame implements IGameLogic {
@@ -36,9 +38,7 @@ public class DummyGame implements IGameLogic {
 //				};
 //		float[] colors = new float[] { 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, 0.5f, };
 		
-		
-		HeightMap heightMap = new HeightMap(0.0f, 0.1f, 0.70f, 40, 40);
-		heightMap.setScale(10);
+		GameModel heightMap = new GameModel(OBJLoader.loadMesh("/teapot.obj"));
 		models = new GameModel[] { heightMap };
 	}
 
