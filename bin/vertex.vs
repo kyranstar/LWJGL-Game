@@ -13,5 +13,5 @@ out vec3 exColor;
 void main()
 {
     gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-    exColor = inColor;
+    exColor = normal;
 }

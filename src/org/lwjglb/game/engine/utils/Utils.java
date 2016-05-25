@@ -48,4 +48,12 @@ public class Utils {
 		return f;
 	}
 
+	public static float[] listToArray(List<Float> list) {
+		float[] f = new float[list.size()];
+		for(int i = 0; i < f.length; i++){
+			f[i] = list.get(i);
+		}
+		return f;
+	}
+
 }

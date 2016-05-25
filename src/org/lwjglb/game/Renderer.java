@@ -33,10 +33,6 @@ public class Renderer {
 		}
 	}
 
-	public void clear() {
-		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-	}
-
 	public void render(Window window, GameModel[] models, Camera camera) {
 		if (window.isResized()) {
 			GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
@@ -44,8 +40,8 @@ public class Renderer {
 			window.setResized(false);
 		}
 
-		window.setClearColor(1, 0, 0, 0.0f);
-		clear();
+		window.setClearColor(.6f, .6f, .6f, 0.0f);
+		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
 		shader.bind();
 		Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(),
