@@ -21,14 +21,14 @@ public class HeightMap extends GameModel {
 			final int height) {
 		SimplexNoise noise = new SimplexNoise(128, persistence, 2);// Utils.getRandom().nextInt());
 
-		float xStep = Math.abs(START_X * 2) / (width-1);
-		float zStep = Math.abs(START_Z * 2) / (height-1);
+		float xStep = Math.abs(START_X * 2) / (width - 1);
+		float zStep = Math.abs(START_Z * 2) / (height - 1);
 
 		List<Float> positions = new ArrayList<>();
 		List<Integer> indices = new ArrayList<>();
 
 		for (int z = 0; z < height; z++) {
-		for (int x = 0; x < width; x++) {
+			for (int x = 0; x < width; x++) {
 				// scale from [-0.5, 0.5] to [minY, maxY]
 				float heightY = (float) ((noise.getNoise(x, z) + 0.5f) * (maxY - minY) + minY);
 

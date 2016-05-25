@@ -16,11 +16,9 @@ public class Mesh {
 	private final int normalVboId;
 	private final int indexVboId;
 
-	private final int vertexCount;
+	private final int indexCount;
 
 	public Mesh(float[] positions, float[] colors, float[] normals, int[] indices) {
-		vertexCount = positions.length;
-
 		vaoId = GL30.glGenVertexArrays();
 		GL30.glBindVertexArray(vaoId);
 
@@ -50,6 +48,7 @@ public class Mesh {
 		indicesBuffer.put(indices).flip();
 		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, indexVboId);
 		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL15.GL_STATIC_DRAW);
+		indexCount = indices.length;
 
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 		GL30.glBindVertexArray(0);
@@ -57,10 +56,6 @@ public class Mesh {
 
 	public int getVboId() {
 		return vertexVboId;
-	}
-
-	public int getVertexCount() {
-		return vertexCount;
 	}
 
 	public int getVaoId() {
@@ -95,7 +90,7 @@ public class Mesh {
 		GL20.glEnableVertexAttribArray(1);
 		GL20.glEnableVertexAttribArray(2);
 
-		GL11.glDrawElements(GL11.GL_TRIANGLES, getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+		GL11.glDrawElements(GL11.GL_TRIANGLES, indexCount, GL11.GL_UNSIGNED_INT, 0);
 
 		GL20.glDisableVertexAttribArray(0);
 		GL20.glDisableVertexAttribArray(1);

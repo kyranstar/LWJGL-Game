@@ -2,6 +2,7 @@ package org.lwjglb.game.engine;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.joml.Vector3f;
@@ -66,10 +67,7 @@ public class OBJLoader {
 		int[] indicesArr = indices.stream().mapToInt((Integer v) -> v).toArray();
 
 		float[] colorArr = new float[posList.size() * 3];
-		for(int j = 0; j < colorArr.length; j++){
-			colorArr[j] = 1;
-		}
-		
+		Arrays.fill(colorArr, 1);
 		Mesh mesh = new Mesh(posArr, colorArr, normArr, indicesArr);
 		return mesh;
 	}
