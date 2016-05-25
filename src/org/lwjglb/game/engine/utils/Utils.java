@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+import org.joml.Vector3f;
+
 public class Utils {
 	private static Random random = new Random();
 
@@ -32,6 +34,18 @@ public class Utils {
 			}
 		}
 		return result;
+	}
+
+	public static float[] listToArr(List<Vector3f> vertices) {
+		float[] f = new float[vertices.size() * 3];
+		int i = 0;
+		for(Vector3f v : vertices){
+			f[i] = v.x;
+			f[i+1] = v.y;
+			f[i+2] = v.z;
+			i += 3;
+		}
+		return f;
 	}
 
 }

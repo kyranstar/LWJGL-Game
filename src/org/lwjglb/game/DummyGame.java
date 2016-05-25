@@ -3,12 +3,12 @@ package org.lwjglb.game;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 import org.lwjglb.game.engine.Camera;
 import org.lwjglb.game.engine.IGameLogic;
 import org.lwjglb.game.engine.MouseInput;
-import org.lwjglb.game.engine.OBJLoader;
 import org.lwjglb.game.engine.Window;
+
+import hu.kazocsaba.v3d.mesh.format.ply.PlyReader;
 
 public class DummyGame implements IGameLogic {
 	private static final float CAMERA_POS_STEP = 0.05f;
@@ -38,8 +38,9 @@ public class DummyGame implements IGameLogic {
 //				};
 //		float[] colors = new float[] { 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, 0.5f, };
 		
-		GameModel heightMap = new GameModel(OBJLoader.loadMesh("/teapot.obj"));
-		models = new GameModel[] { heightMap };
+		GameModel teapot = new GameModel(new PlyReader("/untitled.ply").readMesh());
+		teapot.setScale(.1f);
+		models = new GameModel[] { teapot };
 	}
 
 	@Override
