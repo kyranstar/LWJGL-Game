@@ -1,5 +1,6 @@
 package org.lwjglb.game;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,20 +9,18 @@ import org.lwjglb.game.engine.Mesh;
 import org.lwjglb.game.engine.utils.SimplexNoise;
 import org.lwjglb.game.engine.utils.Utils;
 
-import javafx.scene.paint.Color;
-
 public class HeightMap extends GameModel {
 
 	private static final float START_X = -0.5f;
 	private static final float START_Z = -0.5f;
 	private static final float REFLECTANCE = 10;
 
-	public HeightMap(float minY, float maxY, float persistence, int width, int height) {
-		super(createMesh(minY, maxY, persistence, width, height), REFLECTANCE);
+	public HeightMap(float minY, float maxY, float persistence, int width, int height, float spikeness) {
+		super(createMesh(minY, maxY, persistence, width, height, spikeness), REFLECTANCE);
 	}
 
 	protected static Mesh createMesh(final float minY, final float maxY, final float persistence, final int width,
-			final int height) {
+			final int height, float spikeness) {
 		SimplexNoise noise = new SimplexNoise(128, persistence, 2);// Utils.getRandom().nextInt());
 
 		float xStep = Math.abs(START_X * 2) / (width - 1);
@@ -32,8 +31,9 @@ public class HeightMap extends GameModel {
 
 		for (int z = 0; z < height; z++) {
 			for (int x = 0; x < width; x++) {
-				// scale from [-0.5, 0.5] to [minY, maxY]
-				float heightY = (float) ((noise.getNoise(x, z) + 0.5f) * (maxY - minY) + minY);
+				// scale from [-1, 1] to [minY, maxY]
+				float heightY = (float) ((noise.getNoise(x * xStep * spikeness, z * zStep * spikeness) + 1f) / 2
+						* (maxY - minY) + minY);
 
 				positions.add(START_X + x * xStep);
 				positions.add(heightY);
@@ -58,12 +58,13 @@ public class HeightMap extends GameModel {
 		}
 
 		float[] verticesArr = Utils.listToArray(positions);
-		Color c = Color.BROWN;
+		Color c = new Color(147, 105, 59);
 		float[] colorArr = new float[positions.size()];
 		for (int i = 0; i < colorArr.length; i += 3) {
-			colorArr[i] = (float) c.getRed();
-			colorArr[i + 1] = (float) c.getGreen();
-			colorArr[i + 2] = (float) c.getBlue();
+			float brightness = (Utils.getRandom().nextFloat() - 0.5f) * 0.5f;
+			colorArr[i] = (float) c.getRed() / 255f + brightness;
+			colorArr[i + 1] = (float) c.getGreen() / 255f + brightness;
+			colorArr[i + 2] = (float) c.getBlue() / 255f + brightness;
 		}
 		int[] indicesArr = indices.stream().mapToInt((i) -> i).toArray();
 

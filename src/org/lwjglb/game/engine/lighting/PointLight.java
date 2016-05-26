@@ -1,4 +1,4 @@
-package org.lwjglb.game.engine;
+package org.lwjglb.game.engine.lighting;
 
 import org.joml.Vector3f;
 
