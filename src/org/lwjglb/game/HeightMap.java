@@ -8,13 +8,16 @@ import org.lwjglb.game.engine.Mesh;
 import org.lwjglb.game.engine.utils.SimplexNoise;
 import org.lwjglb.game.engine.utils.Utils;
 
+import javafx.scene.paint.Color;
+
 public class HeightMap extends GameModel {
 
 	private static final float START_X = -0.5f;
 	private static final float START_Z = -0.5f;
+	private static final float REFLECTANCE = 10;
 
 	public HeightMap(float minY, float maxY, float persistence, int width, int height) {
-		super(createMesh(minY, maxY, persistence, width, height));
+		super(createMesh(minY, maxY, persistence, width, height), REFLECTANCE);
 	}
 
 	protected static Mesh createMesh(final float minY, final float maxY, final float persistence, final int width,
@@ -55,11 +58,12 @@ public class HeightMap extends GameModel {
 		}
 
 		float[] verticesArr = Utils.listToArray(positions);
+		Color c = Color.BROWN;
 		float[] colorArr = new float[positions.size()];
 		for (int i = 0; i < colorArr.length; i += 3) {
-			colorArr[i] = (float) i / colorArr.length;
-			colorArr[i + 1] = (float) .25f;
-			colorArr[i + 2] = (float) 0;
+			colorArr[i] = (float) c.getRed();
+			colorArr[i + 1] = (float) c.getGreen();
+			colorArr[i + 2] = (float) c.getBlue();
 		}
 		int[] indicesArr = indices.stream().mapToInt((i) -> i).toArray();
 

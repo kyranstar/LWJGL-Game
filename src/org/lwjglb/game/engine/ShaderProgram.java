@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import static org.lwjgl.opengl.GL20.*;
 
@@ -28,10 +29,37 @@ public class ShaderProgram {
     public void createUniform(String uniformName) throws Exception {
         int uniformLocation = glGetUniformLocation(programId, uniformName);
         if (uniformLocation < 0) {
-            throw new Exception ("Could not find uniform:" + uniformName);
+            throw new Exception ("Could not find uniform: " + uniformName);
         }
         uniforms.put(uniformName, uniformLocation);
     }
+    
+    public void createPointLightUniform(String uniformName) throws Exception {
+        createUniform(uniformName + ".colour");
+        createUniform(uniformName + ".position");
+        createUniform(uniformName + ".intensity");
+        createUniform(uniformName + ".att.constant");
+        createUniform(uniformName + ".att.linear");
+        createUniform(uniformName + ".att.exponent");
+    }
+    
+    public void setUniform(String uniformName, PointLight pointLight) {
+        setUniform(uniformName + ".colour", pointLight.getColor() );
+        setUniform(uniformName + ".position", pointLight.getPosition());
+        setUniform(uniformName + ".intensity", pointLight.getIntensity());
+        PointLight.Attenuation att = pointLight.getAttenuation();
+        setUniform(uniformName + ".att.constant", att.getConstant());
+        setUniform(uniformName + ".att.linear", att.getLinear());
+        setUniform(uniformName + ".att.exponent", att.getExponent());
+    }
+
+    public void setUniform(String uniformName, float f) {
+		glUniform1f(uniforms.get(uniformName), f);
+	}
+
+	public void setUniform(String uniformName, Vector3f position) {
+		glUniform3fv(uniforms.get(uniformName), new float[]{position.x, position.y, position.z});
+	}
     
     public void setUniform(String uniformName, Matrix4f value) {
         // Dump the matrix into a float buffer

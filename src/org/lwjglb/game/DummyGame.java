@@ -6,6 +6,8 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjglb.game.engine.Camera;
 import org.lwjglb.game.engine.IGameLogic;
 import org.lwjglb.game.engine.MouseInput;
+import org.lwjglb.game.engine.PointLight;
+import org.lwjglb.game.engine.PointLight.Attenuation;
 import org.lwjglb.game.engine.Window;
 
 import hu.kazocsaba.v3d.mesh.format.ply.PlyReader;
@@ -17,6 +19,7 @@ public class DummyGame implements IGameLogic {
 	Vector3f cameraInc = new Vector3f();
 	Renderer renderer = new Renderer();
 	private GameModel[] models;
+	private PointLight[] lights;
 
 	@Override
 	public void init(Window window) throws Exception {
@@ -39,10 +42,14 @@ public class DummyGame implements IGameLogic {
 		// float[] colors = new float[] { 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f,
 		// 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, 0.5f, };
 
-		//GameModel torus = new GameModel(new PlyReader("/untitled.ply").readMesh());
-		//torus.setScale(.1f);
+		GameModel torus = new GameModel(new PlyReader("/untitled.ply").readMesh(), 1);
+		torus.setScale(.1f);
+		torus.setPosition(0,3f,0);
 		GameModel heightmap = new HeightMap(0, .25f, .50f, 40, 40);
-		models = new GameModel[] { heightmap };
+		heightmap.setScale(10);
+		models = new GameModel[] { torus,heightmap };
+		
+		lights = new PointLight[]{new PointLight(new Vector3f(1,0,0), new Vector3f(0,3f,0), 5, new Attenuation(1, 3, 3))};
 	}
 
 	@Override
@@ -81,7 +88,7 @@ public class DummyGame implements IGameLogic {
 
 	@Override
 	public void render(Window window) {
-		renderer.render(window, models, camera);
+		renderer.render(window, models, lights, camera);
 	}
 
 	@Override

@@ -12,12 +12,15 @@ public class GameModel {
     private float scale;
 
     private final Vector3f rotation;
+    
+    private final float reflectance;
 
-    public GameModel(Mesh mesh) {
+    public GameModel(Mesh mesh, float reflectance) {
         this.mesh = mesh;
         position = new Vector3f(0, 0, 0);
         scale = 1;
         rotation = new Vector3f(0, 0, 0);
+        this.reflectance = reflectance;
     }
 
     public Vector3f getPosition() {
@@ -51,4 +54,8 @@ public class GameModel {
     public Mesh getMesh() {
         return mesh;
     }
+
+	public float getReflectance() {
+		return reflectance;
+	}
 }
