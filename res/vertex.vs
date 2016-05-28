@@ -17,6 +17,6 @@ void main()
 	vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
     gl_Position =  projectionMatrix * mvPos;
     mvVertexPos = mvPos.xyz;
-    mvVertexNormal = normalize(modelViewMatrix * vec4(mvVertexNormal, 0.0)).xyz;
+    mvVertexNormal = normalize(modelViewMatrix * vec4(normal, 0.0)).xyz;
     exColor = inColor;
 }

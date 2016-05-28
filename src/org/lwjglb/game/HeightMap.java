@@ -13,7 +13,7 @@ public class HeightMap extends GameModel {
 
 	private static final float START_X = -0.5f;
 	private static final float START_Z = -0.5f;
-	private static final float REFLECTANCE = 10;
+	private static final float REFLECTANCE = .1f;
 
 	public HeightMap(float minY, float maxY, float persistence, int width, int height, float spikeness) {
 		super(createMesh(minY, maxY, persistence, width, height, spikeness), REFLECTANCE);

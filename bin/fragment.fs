@@ -54,6 +54,7 @@ vec4 calcLightColour(vec3 light_colour, float light_intensity, vec3 position, ve
     specularFactor = pow(specularFactor, specularPower);
     specColour = light_intensity  * specularFactor * reflectance * vec4(light_colour, 1.0);
 
+
     return (diffuseColour + specColour);
 }
 

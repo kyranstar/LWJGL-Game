@@ -311,8 +311,6 @@ public final class PlyReader {
 	public Mesh readMesh() throws IOException, InvalidPlyFormatException {
 		if (!hasVertices)
 			throw new IllegalStateException("No vertices");
-		if (!hasVertexColors)
-			throw new IllegalStateException("No vertex colors");
 		if (!hasFaces)
 			throw new IllegalStateException("No faces");
 
@@ -333,6 +331,10 @@ public final class PlyReader {
 						vertices.add(v);
 						normals.add(n);
 						colors.add(col);
+						if(!hasVertexColors){
+							col.x = col.y = col.z = 0;
+						}
+						
 						for (int propIndex = 0; propIndex < currentElement.properties.size(); propIndex++) {
 							Property prop = currentElement.properties.get(propIndex);
 							if (propIndex == vertexXPropIndex) {
