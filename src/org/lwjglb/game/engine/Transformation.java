@@ -3,6 +3,7 @@ package org.lwjglb.game.engine;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjglb.game.GameModel;
+import org.lwjglb.game.engine.lighting.PointLight;
 
 public class Transformation {
 
@@ -24,17 +25,30 @@ public class Transformation {
 	}
 
 	public final Matrix4f getViewMatrix(Camera camera) {
-		viewMatrix.identity();
-		viewMatrix.rotate((float) Math.toRadians(camera.getRotation().x), new Vector3f(1, 0, 0));
-		viewMatrix.rotate((float) Math.toRadians(camera.getRotation().y), new Vector3f(0, 1, 0));
-		viewMatrix.translate(-camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
-		return viewMatrix;
+		Vector3f cameraPos = camera.getPosition();
+        Vector3f rotation = camera.getRotation();
+        
+        viewMatrix.identity();
+        // First do the rotation so camera rotates over its position
+        viewMatrix.rotate((float)Math.toRadians(rotation.x), new Vector3f(1, 0, 0))
+                .rotate((float)Math.toRadians(rotation.y), new Vector3f(0, 1, 0));
+        // Then do the translation
+        viewMatrix.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
+        return viewMatrix;
 	}
 
 	public Matrix4f getModelViewMatrix(GameModel model, Matrix4f viewMatrix) {
 		worldMatrix.identity().translate(model.getPosition()).rotateX((float) Math.toRadians(model.getRotation().x))
 				.rotateY((float) Math.toRadians(model.getRotation().y))
 				.rotateZ((float) Math.toRadians(model.getRotation().z)).scale(model.getScale());
+		Matrix4f viewCurr = new Matrix4f(viewMatrix);
+		return viewCurr.mul(worldMatrix);
+	}
+
+	public Matrix4f getModelViewMatrix(WaterMesh model, Matrix4f viewMatrix) {
+		worldMatrix.identity().translate(new Vector3f(0,0,0)).rotateX(0)
+		.rotateY(0)
+		.rotateZ(0).scale(1);
 		Matrix4f viewCurr = new Matrix4f(viewMatrix);
 		return viewCurr.mul(worldMatrix);
 	}

@@ -6,6 +6,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjglb.game.engine.Camera;
 import org.lwjglb.game.engine.IGameLogic;
 import org.lwjglb.game.engine.MouseInput;
+import org.lwjglb.game.engine.WaterMesh;
 import org.lwjglb.game.engine.Window;
 import org.lwjglb.game.engine.lighting.DirectionalLight;
 import org.lwjglb.game.engine.lighting.PointLight;
@@ -21,9 +22,9 @@ public class DummyGame implements IGameLogic {
 	Renderer renderer = new Renderer();
 	private GameModel[] models;
 	private PointLight[] lights;
-	private float lightAngle;
-	private DirectionalLight directionalLight = new DirectionalLight(new Vector3f(0, 1, 0), new Vector3f(1, 1, 1),
-			0f);
+	private DirectionalLight directionalLight = new DirectionalLight(new Vector3f(0, 1, 0), new Vector3f(1, 1, 1), 0f);
+	private WaterMesh waterMesh;
+	private float time;
 
 	@Override
 	public void init(Window window) throws Exception {
@@ -53,8 +54,10 @@ public class DummyGame implements IGameLogic {
 		heightmap.setScale(10);
 		models = new GameModel[] { torus, heightmap };
 
+		waterMesh = new WaterMesh(20, 20, 1f);
+
 		lights = new PointLight[] {
-				new PointLight(new Vector3f(1, 0, 0), new Vector3f(0, 3f, 0), 5, new Attenuation(1, 3, 3)) };
+				new PointLight(new Vector3f(1, 1, 1), new Vector3f(0, 3f, 0), 5, new Attenuation(1, 1, 1)) };
 	}
 
 	@Override
@@ -88,11 +91,13 @@ public class DummyGame implements IGameLogic {
 
 	@Override
 	public void update(float dt) {
+		time += dt;
+		//lights[0].setPosition(camera.getPosition());
 	}
 
 	@Override
 	public void render(Window window) {
-		renderer.render(window, models, lights, camera, directionalLight);
+		renderer.render(window, time, waterMesh, models, lights, camera, directionalLight);
 	}
 
 	@Override

@@ -1,0 +1,94 @@
+#version 330
+
+in vec3 exColor;
+in vec3 mvVertexPos;
+
+out vec4 fragColor;
+
+struct Attenuation
+{
+    float constant;
+    float linear;
+    float exponent;
+};
+
+struct PointLight
+{
+    vec3 colour;
+    // Light position is assumed to be in view coordinates
+    vec3 position;
+    float intensity;
+    Attenuation att;
+};
+struct DirectionalLight
+{
+    vec3 colour;
+    vec3 direction;
+    float intensity;
+};
+
+const int MAX_POINT_LIGHTS = 5;
+
+uniform vec3 ambientLight;
+uniform float specularPower;
+uniform float reflectance;
+uniform PointLight pointLights[MAX_POINT_LIGHTS];
+uniform DirectionalLight directionalLight;
+uniform vec3 camera_pos;
+uniform mat4 modelViewMatrix;
+
+vec4 calcLightColour(vec3 light_colour, float light_intensity, vec3 position, vec3 to_light_dir, vec3 normal)
+{
+    vec4 diffuseColour = vec4(0, 0, 0, 0);
+    vec4 specColour = vec4(0, 0, 0, 0);
+
+    // Diffuse Light
+    float diffuseFactor = max(dot(normal, to_light_dir), 0.0);
+    diffuseColour = vec4(light_colour, 1.0) * light_intensity * diffuseFactor;
+
+    // Specular Light
+    vec3 camera_direction = normalize(camera_pos - position);
+    vec3 from_light_dir = -to_light_dir;
+    vec3 reflected_light = normalize(reflect(from_light_dir , normal));
+    float specularFactor = max( dot(camera_direction, reflected_light), 0.0);
+    specularFactor = pow(specularFactor, specularPower);
+    specColour = light_intensity  * specularFactor * reflectance * vec4(light_colour, 1.0);
+
+    return (diffuseColour + specColour);
+}
+
+vec4 calcPointLight(PointLight light, vec3 position, vec3 normal)
+{
+    vec3 light_direction = light.position - position;
+    vec3 to_light_dir  = normalize(light_direction);
+    vec4 light_colour = calcLightColour(light.colour, light.intensity, position, to_light_dir, normal);
+
+    // Apply Attenuation
+    float distance = length(light_direction);
+    float attenuationInv = light.att.constant + light.att.linear * distance +
+        light.att.exponent * distance * distance;
+    return light_colour / attenuationInv;
+}
+vec4 calcDirectionalLight(DirectionalLight light, vec3 position, vec3 normal)
+{
+    return calcLightColour(light.colour, light.intensity, position, normalize(light.direction), normal);
+}
+
+void main()
+{
+	vec3 normal = normalize(cross(dFdx(mvVertexPos), dFdy(mvVertexPos)));
+	vec3 mvNormal = normalize(modelViewMatrix * vec4(normal, 0)).xyz;
+    vec4 baseColour = vec4(exColor, 1);
+
+    vec4 totalLight = vec4(ambientLight, 1.0);
+    for (int i = 0; i < MAX_POINT_LIGHTS; i++)
+	{
+    	if ( pointLights[i].intensity > 0 )
+    	{
+    	    totalLight += calcPointLight(pointLights[i], mvVertexPos, mvNormal); 
+    	}
+	}
+   	totalLight += calcDirectionalLight(directionalLight, mvVertexPos, mvNormal); 
+
+    fragColor = baseColour * totalLight;
+}

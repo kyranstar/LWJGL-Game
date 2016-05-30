@@ -1,18 +1,17 @@
 package org.lwjglb.game.engine;
-
 import org.joml.Vector3f;
 
 public class Camera {
 
     private final Vector3f position;
-
+    
     private final Vector3f rotation;
-
+    
     public Camera() {
         position = new Vector3f(0, 0, 0);
         rotation = new Vector3f(0, 0, 0);
     }
-
+    
     public Camera(Vector3f position, Vector3f rotation) {
         this.position = position;
         this.rotation = rotation;
@@ -27,7 +26,7 @@ public class Camera {
         position.y = y;
         position.z = z;
     }
-
+    
     public void movePosition(float offsetX, float offsetY, float offsetZ) {
         if ( offsetZ != 0 ) {
             position.x += (float)Math.sin(Math.toRadians(rotation.y)) * -1.0f * offsetZ;
@@ -43,7 +42,7 @@ public class Camera {
     public Vector3f getRotation() {
         return rotation;
     }
-
+    
     public void setRotation(float x, float y, float z) {
         rotation.x = x;
         rotation.y = y;
