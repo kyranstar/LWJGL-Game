@@ -16,9 +16,9 @@ out vec3 mvVertexPos;
 vec3 generateWavePos()
 {
 	//  amplitude * sin(dot(direction, (x, y)) * (2 * pi/wavelength) + time * (speed * (2* pi/wavelength)))
-	float wave1 = .05 * sin(dot(vec2(.8,.3), vec2(pos.x, pos.z)) * (M_2PI/2) + time * (.3 * (M_2PI/2)));
-	float wave2 = .05 * sin(dot(vec2(.2,.6), vec2(pos.x, pos.z)) * (M_2PI/1) + time * (.2 * (M_2PI/1)));
-	float wave3 = .05 * sin(dot(vec2(.4,.1), vec2(pos.x, pos.z)) * (M_2PI/1) + time * (.5 * (M_2PI/1)));
+	float wave1 = .003 * sin(dot(vec2(.8,.3), vec2(pos.x, pos.z)) * (M_2PI/.02) + time * (.005 * (M_2PI/.02)));
+	float wave2 = .003 * sin(dot(vec2(.2,.6), vec2(pos.x, pos.z)) * (M_2PI/.02) + time * (.001 * (M_2PI/.02)));
+	float wave3 = .002 * sin(dot(vec2(.4,.1), vec2(pos.x, pos.z)) * (M_2PI/.2) + time * (.01 * (M_2PI/.2)));
 	float height = wave1 + wave2 + wave3;
 	return vec3(pos.x, pos.y + height, pos.z);
 }

@@ -45,11 +45,4 @@ public class Transformation {
 		return viewCurr.mul(worldMatrix);
 	}
 
-	public Matrix4f getModelViewMatrix(WaterMesh model, Matrix4f viewMatrix) {
-		worldMatrix.identity().translate(new Vector3f(0,0,0)).rotateX(0)
-		.rotateY(0)
-		.rotateZ(0).scale(1);
-		Matrix4f viewCurr = new Matrix4f(viewMatrix);
-		return viewCurr.mul(worldMatrix);
-	}
 }

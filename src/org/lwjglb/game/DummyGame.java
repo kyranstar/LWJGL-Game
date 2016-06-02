@@ -54,7 +54,8 @@ public class DummyGame implements IGameLogic {
 		heightmap.setScale(10);
 		models = new GameModel[] { torus, heightmap };
 
-		waterMesh = new WaterMesh(20, 20, 1f);
+		waterMesh = new WaterMesh(20, 20, .1f);
+		waterMesh.setScale(10);
 
 		lights = new PointLight[] {
 				new PointLight(new Vector3f(1, 1, 1), new Vector3f(0, 3f, 0), 5, new Attenuation(1, 1, 1)) };

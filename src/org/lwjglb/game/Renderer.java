@@ -4,14 +4,15 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 import org.lwjglb.game.engine.Camera;
 import org.lwjglb.game.engine.ShaderProgram;
 import org.lwjglb.game.engine.Transformation;
 import org.lwjglb.game.engine.WaterMesh;
+import org.lwjglb.game.engine.WaterShader;
 import org.lwjglb.game.engine.Window;
 import org.lwjglb.game.engine.lighting.DirectionalLight;
 import org.lwjglb.game.engine.lighting.PointLight;
-import org.lwjglb.game.engine.utils.Utils;
 
 public class Renderer {
 
@@ -37,10 +38,7 @@ public class Renderer {
 
 	public void init(Window window) {
 		try {
-			shader = new ShaderProgram();
-			shader.createFragmentShader(Utils.loadResource("/fragment.fs"));
-			shader.createVertexShader(Utils.loadResource("/vertex.vs"));
-			shader.link();
+			shader = new ShaderProgram("/vertex.vs", "/fragment.fs");
 			shader.createUniform("projectionMatrix");
 			shader.createUniform("modelViewMatrix");
 			shader.createUniform("ambientLight");
@@ -49,20 +47,9 @@ public class Renderer {
 			shader.createPointLightListUniform("pointLights", MAX_POINT_LIGHTS);
 			shader.createDirectionalLightUniform("directionalLight");
 			shader.createUniform("camera_pos");
+			shader.createUniform("clipPlane");
 
-			waterShader = new ShaderProgram();
-			waterShader.createFragmentShader(Utils.loadResource("/waterFragment.fs"));
-			waterShader.createVertexShader(Utils.loadResource("/waterVertex.vs"));
-			waterShader.link();
-			waterShader.createUniform("projectionMatrix");
-			waterShader.createUniform("modelViewMatrix");
-			waterShader.createUniform("ambientLight");
-			waterShader.createUniform("specularPower");
-			waterShader.createUniform("reflectance");
-			waterShader.createPointLightListUniform("pointLights", MAX_POINT_LIGHTS);
-			waterShader.createDirectionalLightUniform("directionalLight");
-			waterShader.createUniform("camera_pos");
-			waterShader.createUniform("time");
+			waterShader = new WaterShader(MAX_POINT_LIGHTS);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -79,6 +66,7 @@ public class Renderer {
 
 		window.setClearColor(.6f, .6f, .6f, 0.0f);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+		GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 
 		Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(),
 				Z_NEAR, Z_FAR);
@@ -93,21 +81,27 @@ public class Renderer {
 		waterShader.setUniform("reflectance", WATER_REFLECTANCE);
 		waterShader.setUniform("time", time);
 		renderLights(waterShader, viewMatrix, pointLights, directionalLight);
-		water.render();
+		water.getMesh().render();
 		waterShader.unbind();
 
 		// render game models
+		renderModels(models, pointLights, camera, directionalLight, projectionMatrix, viewMatrix, new Vector4f(0, 0, 0, 0));
+
+	}
+
+	private void renderModels(GameModel[] models, PointLight[] pointLights, Camera camera,
+			DirectionalLight directionalLight, Matrix4f projectionMatrix, Matrix4f viewMatrix, Vector4f clipPlane) {
 		shader.bind();
 		shader.setUniform("projectionMatrix", projectionMatrix);
 		renderLights(shader, viewMatrix, pointLights, directionalLight);
 		shader.setUniform("camera_pos", camera.getPosition());
+		shader.setUniform("clipPlane", clipPlane);
 		for (int i = 0; i < models.length; i++) {
 			shader.setUniform("reflectance", models[i].getReflectance());
 			shader.setUniform("modelViewMatrix", transformation.getModelViewMatrix(models[i], viewMatrix));
 			models[i].getMesh().render();
 		}
 		shader.unbind();
-
 	}
 
 	private void renderLights(ShaderProgram shader, Matrix4f viewMatrix, PointLight[] pointLightList, DirectionalLight directionalLight) {

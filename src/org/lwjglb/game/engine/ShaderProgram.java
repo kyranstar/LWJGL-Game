@@ -29,9 +29,13 @@ import java.util.Map;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL20;
 import org.lwjglb.game.engine.lighting.DirectionalLight;
 import org.lwjglb.game.engine.lighting.PointLight;
+import org.lwjglb.game.engine.utils.Utils;
 
 public class ShaderProgram {
 
@@ -43,12 +47,15 @@ public class ShaderProgram {
 
     private final Map<String, Integer> uniforms;
 
-    public ShaderProgram() throws Exception {
+    public ShaderProgram(String vertexFile, String fragmentFile) throws Exception {
         programId = glCreateProgram();
         if (programId == 0) {
             throw new Exception("Could not create Shader");
         }
         uniforms = new HashMap<>();
+        createFragmentShader(Utils.loadResource(fragmentFile));
+        createVertexShader(Utils.loadResource(vertexFile));
+        link();
     }
 
     public void createUniform(String uniformName) throws Exception {
@@ -115,11 +122,11 @@ public class ShaderProgram {
         glUniformMatrix4fv(uniforms.get(uniformName), false, fb);
     }
 
-    public void createVertexShader(String shaderCode) throws Exception {
+    private void createVertexShader(String shaderCode) throws Exception {
         vertexShaderId = createShader(shaderCode, GL_VERTEX_SHADER);
     }
 
-    public void createFragmentShader(String shaderCode) throws Exception {
+    private void createFragmentShader(String shaderCode) throws Exception {
         fragmentShaderId = createShader(shaderCode, GL_FRAGMENT_SHADER);
     }
 
@@ -141,7 +148,7 @@ public class ShaderProgram {
         return shaderId;
     }
 
-    public void link() throws Exception {
+    private void link() throws Exception {
         glLinkProgram(programId);
         if (glGetProgrami(programId, GL_LINK_STATUS) == 0) {
             throw new Exception("Error linking shader code: " + glGetShaderInfoLog(programId, 1024));
@@ -179,5 +186,9 @@ public class ShaderProgram {
 		for(int i = 0; i < num; i++){
 			createPointLightUniform(string + "[" + i + "]");
 		}
+	}
+
+	public void setUniform(String uniformName, Vector4f v) {
+		GL20.glUniform4f(uniforms.get(uniformName), v.x, v.y, v.z, v.w);
 	}
 }
