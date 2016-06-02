@@ -1,4 +1,6 @@
-package org.lwjglb.game.engine;
+package org.lwjglb.game.engine.water;
+
+import org.lwjglb.game.engine.ShaderProgram;
 
 public class WaterShader extends ShaderProgram {
 

@@ -6,6 +6,7 @@ layout (location=2) in vec3 normal;
 
 // projection * view
 uniform mat4 projectionMatrix;
+uniform mat4 modelMatrix;
 uniform mat4 modelViewMatrix;
 uniform vec4 clipPlane;
 
@@ -15,7 +16,7 @@ out vec3 mvVertexPos;
 
 void main()
 {
-	gl_ClipDistance[0] = dot(vec4(pos, 1.0), clipPlane);
+	gl_ClipDistance[0] = dot(modelMatrix * vec4(pos, 1.0), clipPlane);
 	
 	vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
 	

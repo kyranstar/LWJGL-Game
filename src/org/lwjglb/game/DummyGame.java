@@ -6,11 +6,11 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjglb.game.engine.Camera;
 import org.lwjglb.game.engine.IGameLogic;
 import org.lwjglb.game.engine.MouseInput;
-import org.lwjglb.game.engine.WaterMesh;
 import org.lwjglb.game.engine.Window;
 import org.lwjglb.game.engine.lighting.DirectionalLight;
 import org.lwjglb.game.engine.lighting.PointLight;
 import org.lwjglb.game.engine.lighting.PointLight.Attenuation;
+import org.lwjglb.game.engine.water.WaterModel;
 
 import hu.kazocsaba.v3d.mesh.format.ply.PlyReader;
 
@@ -23,7 +23,7 @@ public class DummyGame implements IGameLogic {
 	private GameModel[] models;
 	private PointLight[] lights;
 	private DirectionalLight directionalLight = new DirectionalLight(new Vector3f(0, 1, 0), new Vector3f(1, 1, 1), 0f);
-	private WaterMesh waterMesh;
+	private WaterModel waterMesh;
 	private float time;
 
 	@Override
@@ -54,7 +54,7 @@ public class DummyGame implements IGameLogic {
 		heightmap.setScale(10);
 		models = new GameModel[] { torus, heightmap };
 
-		waterMesh = new WaterMesh(20, 20, .1f);
+		waterMesh = new WaterModel(20, 20, .1f);
 		waterMesh.setScale(10);
 
 		lights = new PointLight[] {

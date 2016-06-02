@@ -38,11 +38,15 @@ public class Transformation {
 	}
 
 	public Matrix4f getModelViewMatrix(GameModel model, Matrix4f viewMatrix) {
-		worldMatrix.identity().translate(model.getPosition()).rotateX((float) Math.toRadians(model.getRotation().x))
-				.rotateY((float) Math.toRadians(model.getRotation().y))
-				.rotateZ((float) Math.toRadians(model.getRotation().z)).scale(model.getScale());
 		Matrix4f viewCurr = new Matrix4f(viewMatrix);
-		return viewCurr.mul(worldMatrix);
+		return viewCurr.mul(getModelMatrix(model));
+	}
+
+	public Matrix4f getModelMatrix(GameModel model) {
+		worldMatrix.identity().translate(model.getPosition()).rotateX((float) Math.toRadians(model.getRotation().x))
+		.rotateY((float) Math.toRadians(model.getRotation().y))
+		.rotateZ((float) Math.toRadians(model.getRotation().z)).scale(model.getScale());
+		return worldMatrix;
 	}
 
 }

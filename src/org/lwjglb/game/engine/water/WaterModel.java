@@ -1,26 +1,20 @@
-package org.lwjglb.game.engine;
+package org.lwjglb.game.engine.water;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
 import org.lwjglb.game.GameModel;
+import org.lwjglb.game.engine.Mesh;
 import org.lwjglb.game.engine.utils.Utils;
 
-public class WaterMesh extends GameModel{
+public class WaterModel extends GameModel{
 	private static final float START_X = -0.5f;
 	private static final float START_Z = -0.5f;
 	private static final float REFLECTANCE = 0.8f;
 	
 	private final float height;
 
-	public WaterMesh(int vertX, int vertY, float height) {
+	public WaterModel(int vertX, int vertY, float height) {
 		super(generateMesh(vertX, vertY, height), REFLECTANCE);
 		this.height = height;
 		
@@ -69,6 +63,6 @@ public class WaterMesh extends GameModel{
 	}
 
 	public float getHeight() {
-		return height / getScale();
+		return height * getScale();
 	}
 }

@@ -8,11 +8,11 @@ import org.lwjgl.opengl.GL30;
 import org.lwjglb.game.engine.Camera;
 import org.lwjglb.game.engine.ShaderProgram;
 import org.lwjglb.game.engine.Transformation;
-import org.lwjglb.game.engine.WaterMesh;
-import org.lwjglb.game.engine.WaterShader;
 import org.lwjglb.game.engine.Window;
 import org.lwjglb.game.engine.lighting.DirectionalLight;
 import org.lwjglb.game.engine.lighting.PointLight;
+import org.lwjglb.game.engine.water.WaterModel;
+import org.lwjglb.game.engine.water.WaterShader;
 
 public class Renderer {
 
@@ -41,6 +41,7 @@ public class Renderer {
 			shader = new ShaderProgram("/vertex.vs", "/fragment.fs");
 			shader.createUniform("projectionMatrix");
 			shader.createUniform("modelViewMatrix");
+			shader.createUniform("modelMatrix");
 			shader.createUniform("ambientLight");
 			shader.createUniform("specularPower");
 			shader.createUniform("reflectance");
@@ -56,7 +57,7 @@ public class Renderer {
 		}
 	}
 
-	public void render(Window window, float time, WaterMesh water, GameModel[] models, PointLight[] pointLights, Camera camera,
+	public void render(Window window, float time, WaterModel water, GameModel[] models, PointLight[] pointLights, Camera camera,
 			DirectionalLight directionalLight) {
 		if (window.isResized()) {
 			GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
@@ -85,7 +86,8 @@ public class Renderer {
 		waterShader.unbind();
 
 		// render game models
-		renderModels(models, pointLights, camera, directionalLight, projectionMatrix, viewMatrix, new Vector4f(0, 0, 0, 0));
+		renderModels(models, pointLights, camera, directionalLight, projectionMatrix, viewMatrix, new Vector4f(0, -1, 0, water.getHeight()));
+		
 
 	}
 
@@ -98,6 +100,7 @@ public class Renderer {
 		shader.setUniform("clipPlane", clipPlane);
 		for (int i = 0; i < models.length; i++) {
 			shader.setUniform("reflectance", models[i].getReflectance());
+			shader.setUniform("modelMatrix", transformation.getModelMatrix(models[i]));
 			shader.setUniform("modelViewMatrix", transformation.getModelViewMatrix(models[i], viewMatrix));
 			models[i].getMesh().render();
 		}
