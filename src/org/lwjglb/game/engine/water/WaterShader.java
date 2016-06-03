@@ -21,6 +21,7 @@ public class WaterShader extends ShaderProgram {
 		createDirectionalLightUniform("directionalLight");
 		createUniform("time");
 		createUniform("refractTex");
+		createUniform("reflectTex");
 	}
 
 }

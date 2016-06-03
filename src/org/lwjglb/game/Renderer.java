@@ -83,26 +83,44 @@ public class Renderer {
 		Matrix4f viewMatrix = transformation.getViewMatrix(camera);
 
 		fbos.bindRefractionFrameBuffer();
-		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-		GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getRefractionTexture());
+		{
+			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
+			GL13.glActiveTexture(GL13.GL_TEXTURE0);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getRefractionTexture());
 
-		// render game models
-		float maxWaterHeight = water.getHeight() + WaterShader.MAX_HEIGHT_DIF * water.getScale();
-		renderModels(models, pointLights, camera, directionalLight, projectionMatrix, viewMatrix,
-				new Vector4f(0, -1, 0, maxWaterHeight));
+			// render game models
+			float maxWaterHeight = water.getHeight() + WaterShader.MAX_HEIGHT_DIF * water.getScale();
+			renderModels(models, pointLights, camera, directionalLight, projectionMatrix, viewMatrix,
+					new Vector4f(0, -1, 0, maxWaterHeight));
 
+		}
+		fbos.bindReflectionFrameBuffer();
+		{
+			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
+			GL13.glActiveTexture(GL13.GL_TEXTURE1);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getReflectionTexture());
+
+			// render game models
+			float minWaterHeight = water.getHeight() - WaterShader.MAX_HEIGHT_DIF * water.getScale();
+			renderModels(models, pointLights, camera, directionalLight, projectionMatrix, viewMatrix,
+					new Vector4f(0, -1, 0, minWaterHeight));
+		}
 		fbos.unbindCurrentFrameBuffer();
 
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getRefractionTexture());
+		GL13.glActiveTexture(GL13.GL_TEXTURE1);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getReflectionTexture());
 
 		// render water
 		waterShader.bind();
 		waterShader.setUniform("refractTex", 0);
+		waterShader.setUniform("reflectTex", 1);
 		waterShader.setUniform("projectionMatrix", projectionMatrix);
 		waterShader.setUniform("modelViewMatrix", transformation.getModelViewMatrix(water, viewMatrix));
 		waterShader.setUniform("reflectance", WATER_REFLECTANCE);
@@ -188,6 +206,9 @@ public class Renderer {
 		}
 		if (waterShader != null) {
 			waterShader.cleanup();
+		}
+		if (fbos != null) {
+			fbos.cleanup();
 		}
 	}
 
