@@ -6,6 +6,8 @@ public class WaterShader extends ShaderProgram {
 
 	private static final String VERTEX_FILE = "/waterVertex.vs";
 	private static final String FRAGMENT_FILE = "/waterFragment.fs";
+	// sum of the amplitudes of the wave generator function in the water vertex shader
+	public static final float MAX_HEIGHT_DIF = 0.003f + 0.003f + 0.002f;
 	
 	public WaterShader(int maxPointLights) throws Exception {
 		super(VERTEX_FILE, FRAGMENT_FILE);
@@ -18,6 +20,7 @@ public class WaterShader extends ShaderProgram {
 		createPointLightListUniform("pointLights", maxPointLights);
 		createDirectionalLightUniform("directionalLight");
 		createUniform("time");
+		createUniform("refractTex");
 	}
 
 }

@@ -10,6 +10,7 @@ uniform float time;
 
 out vec3 exColor;
 out vec3 mvVertexPos;
+out vec4 clipSpace;
 
 #define M_2PI 6.283185307179586476925286766559
 
@@ -28,7 +29,8 @@ void main()
 	vec3 newPos = generateWavePos();
 
 	vec4 mvPos = modelViewMatrix * vec4(newPos, 1.0);
-    gl_Position =  projectionMatrix * mvPos;
+	clipSpace = projectionMatrix * mvPos;
+    gl_Position =  clipSpace;
     mvVertexPos = mvPos.xyz;
     exColor = inColor;
 }

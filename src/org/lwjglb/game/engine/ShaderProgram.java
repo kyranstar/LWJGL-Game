@@ -110,6 +110,9 @@ public class ShaderProgram {
     public void setUniform(String uniformName, float f) {
 		glUniform1f(uniforms.get(uniformName), f);
 	}
+    public void setUniform(String uniformName, int i) {
+		GL20.glUniform1i(uniforms.get(uniformName), i);
+	}
 
 	public void setUniform(String uniformName, Vector3f position) {
 		glUniform3fv(uniforms.get(uniformName), new float[]{position.x, position.y, position.z});

@@ -4,6 +4,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
 import org.lwjglb.game.engine.Camera;
 import org.lwjglb.game.engine.ShaderProgram;
@@ -11,10 +12,13 @@ import org.lwjglb.game.engine.Transformation;
 import org.lwjglb.game.engine.Window;
 import org.lwjglb.game.engine.lighting.DirectionalLight;
 import org.lwjglb.game.engine.lighting.PointLight;
+import org.lwjglb.game.engine.water.WaterFrameBuffers;
 import org.lwjglb.game.engine.water.WaterModel;
 import org.lwjglb.game.engine.water.WaterShader;
 
 public class Renderer {
+
+	private static final Vector4f NO_CLIP = new Vector4f(0, 0, 0, 0);
 
 	private static final float FOV = (float) Math.toRadians(60.0f);
 
@@ -28,13 +32,15 @@ public class Renderer {
 
 	private static final int MAX_POINT_LIGHTS = 5;
 
-	private static final float WATER_REFLECTANCE = 1f;
+	private static final float WATER_REFLECTANCE = .9f;
 
 	private Transformation transformation = new Transformation();
 
 	ShaderProgram shader;
 
-	ShaderProgram waterShader;
+	WaterShader waterShader;
+
+	WaterFrameBuffers fbos;
 
 	public void init(Window window) {
 		try {
@@ -51,13 +57,15 @@ public class Renderer {
 
 			waterShader = new WaterShader(MAX_POINT_LIGHTS);
 
+			fbos = new WaterFrameBuffers(window);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void render(Window window, float time, WaterModel water, GameModel[] models, PointLight[] pointLights, Camera camera,
-			DirectionalLight directionalLight) {
+	public void render(Window window, float time, WaterModel water, GameModel[] models, PointLight[] pointLights,
+			Camera camera, DirectionalLight directionalLight) {
 		if (window.isResized()) {
 			GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
 
@@ -67,14 +75,34 @@ public class Renderer {
 		window.setClearColor(.6f, .6f, .6f, 0.0f);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
 
 		Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(),
 				Z_NEAR, Z_FAR);
 
 		Matrix4f viewMatrix = transformation.getViewMatrix(camera);
 
+		fbos.bindRefractionFrameBuffer();
+		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+		GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getRefractionTexture());
+
+		// render game models
+		float maxWaterHeight = water.getHeight() + WaterShader.MAX_HEIGHT_DIF * water.getScale();
+		renderModels(models, pointLights, camera, directionalLight, projectionMatrix, viewMatrix,
+				new Vector4f(0, -1, 0, maxWaterHeight));
+
+		fbos.unbindCurrentFrameBuffer();
+
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getRefractionTexture());
+
 		// render water
 		waterShader.bind();
+		waterShader.setUniform("refractTex", 0);
 		waterShader.setUniform("projectionMatrix", projectionMatrix);
 		waterShader.setUniform("modelViewMatrix", transformation.getModelViewMatrix(water, viewMatrix));
 		waterShader.setUniform("reflectance", WATER_REFLECTANCE);
@@ -84,7 +112,7 @@ public class Renderer {
 		waterShader.unbind();
 
 		// render game models
-		renderModels(models, pointLights, camera, directionalLight, projectionMatrix, viewMatrix, new Vector4f(0,0, 0, 0));
+		renderModels(models, pointLights, camera, directionalLight, projectionMatrix, viewMatrix, NO_CLIP);
 
 	}
 
@@ -103,7 +131,8 @@ public class Renderer {
 		shader.unbind();
 	}
 
-	private void renderLights(ShaderProgram shader, Matrix4f viewMatrix, PointLight[] pointLightList, DirectionalLight directionalLight) {
+	private void renderLights(ShaderProgram shader, Matrix4f viewMatrix, PointLight[] pointLightList,
+			DirectionalLight directionalLight) {
 
 		shader.setUniform("ambientLight", AMBIENT_LIGHT);
 		shader.setUniform("specularPower", SPECULAR_POWER);

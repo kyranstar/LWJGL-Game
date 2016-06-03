@@ -2,6 +2,7 @@
 
 in vec3 exColor;
 in vec3 mvVertexPos;
+in vec4 clipSpace;
 
 out vec4 fragColor;
 
@@ -35,6 +36,7 @@ uniform float reflectance;
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
 uniform DirectionalLight directionalLight;
 uniform mat4 modelViewMatrix;
+uniform sampler2D refractTex;
 
 vec4 calcLightColour(vec3 light_colour, float light_intensity, vec3 position, vec3 to_light_dir, vec3 normal)
 {
@@ -77,7 +79,11 @@ vec4 calcDirectionalLight(DirectionalLight light, vec3 position, vec3 normal)
 void main()
 {
 	vec3 normal = normalize(cross(dFdx(mvVertexPos), dFdy(mvVertexPos)));
-    vec4 baseColour = vec4(exColor, 1);
+	
+	vec2 ndc = (clipSpace.xy/clipSpace.w)/2 + 0.5;
+	
+	vec4 refractColor = texture(refractTex, ndc);
+    vec4 baseColour = mix(refractColor, vec4(exColor, 1), 0.5);
 
     vec4 totalLight = vec4(ambientLight, 1.0);
     for (int i = 0; i < MAX_POINT_LIGHTS; i++)
@@ -91,3 +97,4 @@ void main()
 
     fragColor = baseColour * totalLight;
 }
+	
