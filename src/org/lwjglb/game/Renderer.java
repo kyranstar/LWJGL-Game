@@ -28,7 +28,7 @@ public class Renderer {
 
 	private static final int MAX_POINT_LIGHTS = 5;
 
-	private static final float WATER_REFLECTANCE = .9f;
+	private static final float WATER_REFLECTANCE = 1f;
 
 	private Transformation transformation = new Transformation();
 
@@ -47,7 +47,6 @@ public class Renderer {
 			shader.createUniform("reflectance");
 			shader.createPointLightListUniform("pointLights", MAX_POINT_LIGHTS);
 			shader.createDirectionalLightUniform("directionalLight");
-			shader.createUniform("camera_pos");
 			shader.createUniform("clipPlane");
 
 			waterShader = new WaterShader(MAX_POINT_LIGHTS);
@@ -78,7 +77,6 @@ public class Renderer {
 		waterShader.bind();
 		waterShader.setUniform("projectionMatrix", projectionMatrix);
 		waterShader.setUniform("modelViewMatrix", transformation.getModelViewMatrix(water, viewMatrix));
-		waterShader.setUniform("camera_pos", camera.getPosition());
 		waterShader.setUniform("reflectance", WATER_REFLECTANCE);
 		waterShader.setUniform("time", time);
 		renderLights(waterShader, viewMatrix, pointLights, directionalLight);
@@ -86,8 +84,7 @@ public class Renderer {
 		waterShader.unbind();
 
 		// render game models
-		renderModels(models, pointLights, camera, directionalLight, projectionMatrix, viewMatrix, new Vector4f(0, -1, 0, water.getHeight()));
-		
+		renderModels(models, pointLights, camera, directionalLight, projectionMatrix, viewMatrix, new Vector4f(0,0, 0, 0));
 
 	}
 
@@ -96,7 +93,6 @@ public class Renderer {
 		shader.bind();
 		shader.setUniform("projectionMatrix", projectionMatrix);
 		renderLights(shader, viewMatrix, pointLights, directionalLight);
-		shader.setUniform("camera_pos", camera.getPosition());
 		shader.setUniform("clipPlane", clipPlane);
 		for (int i = 0; i < models.length; i++) {
 			shader.setUniform("reflectance", models[i].getReflectance());

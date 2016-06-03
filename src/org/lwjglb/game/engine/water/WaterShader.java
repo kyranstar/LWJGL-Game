@@ -17,7 +17,6 @@ public class WaterShader extends ShaderProgram {
 		createUniform("reflectance");
 		createPointLightListUniform("pointLights", maxPointLights);
 		createDirectionalLightUniform("directionalLight");
-		createUniform("camera_pos");
 		createUniform("time");
 	}
 
