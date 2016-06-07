@@ -50,8 +50,9 @@ public class Camera {
     }
 
     public void moveRotation(float offsetX, float offsetY, float offsetZ) {
-        rotation.x += offsetX;
-        rotation.y += offsetY;
-        rotation.y += offsetZ;
+    	// + 360 to make positive result
+        rotation.x = (rotation.x + offsetX + 360f) % 360f;
+        rotation.y = (rotation.y + offsetY + 360f) % 360f;
+        rotation.z = (rotation.z + offsetZ + 360f) % 360f;
     }
 }

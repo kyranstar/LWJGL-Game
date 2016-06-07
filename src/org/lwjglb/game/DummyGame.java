@@ -17,7 +17,7 @@ import hu.kazocsaba.v3d.mesh.format.ply.PlyReader;
 public class DummyGame implements IGameLogic {
 	private static final float CAMERA_POS_STEP = 0.05f;
 	private static final float MOUSE_SENSITIVITY = 0.4f;
-	Camera camera = new Camera();
+	Camera camera = new Camera(new Vector3f(0,3,0), new Vector3f());
 	Vector3f cameraInc = new Vector3f();
 	Renderer renderer = new Renderer();
 	private GameModel[] models;

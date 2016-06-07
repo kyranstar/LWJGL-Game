@@ -62,6 +62,7 @@ public class Renderer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 	}
 
 	public void render(Window window, float time, WaterModel water, GameModel[] models, PointLight[] pointLights,
@@ -80,19 +81,15 @@ public class Renderer {
 		Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(),
 				Z_NEAR, Z_FAR);
 
-		Matrix4f viewMatrix = transformation.getViewMatrix(camera);
-
 		fbos.bindRefractionFrameBuffer();
 		{
 			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			GL13.glActiveTexture(GL13.GL_TEXTURE0);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getRefractionTexture());
 
 			// render game models
 			float maxWaterHeight = water.getHeight() + WaterShader.MAX_HEIGHT_DIF * water.getScale();
-			renderModels(models, pointLights, camera, directionalLight, projectionMatrix, viewMatrix,
+			renderModels(models, pointLights, camera, directionalLight, projectionMatrix,
 					new Vector4f(0, -1, 0, maxWaterHeight));
 
 		}
@@ -101,13 +98,17 @@ public class Renderer {
 			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			GL13.glActiveTexture(GL13.GL_TEXTURE1);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getReflectionTexture());
+
+			float dist = 2 * (camera.getPosition().y - water.getHeight());
+			
+			Camera reflectionCamera = new Camera(new Vector3f(camera.getPosition()), new Vector3f(camera.getRotation()));
+			reflectionCamera.movePosition(0, -dist, 0);
+			reflectionCamera.getRotation().x = -reflectionCamera.getRotation().x;
 
 			// render game models
 			float minWaterHeight = water.getHeight() - WaterShader.MAX_HEIGHT_DIF * water.getScale();
-			renderModels(models, pointLights, camera, directionalLight, projectionMatrix, viewMatrix,
-					new Vector4f(0, -1, 0, minWaterHeight));
+			renderModels(models, pointLights, reflectionCamera, directionalLight, projectionMatrix,
+					new Vector4f(0, 1, 0, -minWaterHeight));
 		}
 		fbos.unbindCurrentFrameBuffer();
 
@@ -122,36 +123,39 @@ public class Renderer {
 		waterShader.setUniform("refractTex", 0);
 		waterShader.setUniform("reflectTex", 1);
 		waterShader.setUniform("projectionMatrix", projectionMatrix);
-		waterShader.setUniform("modelViewMatrix", transformation.getModelViewMatrix(water, viewMatrix));
+		waterShader.setUniform("modelViewMatrix",
+				transformation.getModelViewMatrix(water, transformation.getViewMatrix(camera)));
 		waterShader.setUniform("reflectance", WATER_REFLECTANCE);
 		waterShader.setUniform("time", time);
-		renderLights(waterShader, viewMatrix, pointLights, directionalLight);
+		renderLights(waterShader, camera, pointLights, directionalLight);
 		water.getMesh().render();
 		waterShader.unbind();
 
 		// render game models
-		renderModels(models, pointLights, camera, directionalLight, projectionMatrix, viewMatrix, NO_CLIP);
+		renderModels(models, pointLights, camera, directionalLight, projectionMatrix, NO_CLIP);
 
 	}
 
 	private void renderModels(GameModel[] models, PointLight[] pointLights, Camera camera,
-			DirectionalLight directionalLight, Matrix4f projectionMatrix, Matrix4f viewMatrix, Vector4f clipPlane) {
+			DirectionalLight directionalLight, Matrix4f projectionMatrix, Vector4f clipPlane) {
 		shader.bind();
 		shader.setUniform("projectionMatrix", projectionMatrix);
-		renderLights(shader, viewMatrix, pointLights, directionalLight);
+		renderLights(shader, camera, pointLights, directionalLight);
 		shader.setUniform("clipPlane", clipPlane);
 		for (int i = 0; i < models.length; i++) {
 			shader.setUniform("reflectance", models[i].getReflectance());
 			shader.setUniform("modelMatrix", transformation.getModelMatrix(models[i]));
-			shader.setUniform("modelViewMatrix", transformation.getModelViewMatrix(models[i], viewMatrix));
+			shader.setUniform("modelViewMatrix",
+					transformation.getModelViewMatrix(models[i], transformation.getViewMatrix(camera)));
 			models[i].getMesh().render();
 		}
 		shader.unbind();
 	}
 
-	private void renderLights(ShaderProgram shader, Matrix4f viewMatrix, PointLight[] pointLightList,
+	private void renderLights(ShaderProgram shader, Camera camera, PointLight[] pointLightList,
 			DirectionalLight directionalLight) {
 
+		Matrix4f viewMatrix = transformation.getViewMatrix(camera);
 		shader.setUniform("ambientLight", AMBIENT_LIGHT);
 		shader.setUniform("specularPower", SPECULAR_POWER);
 
