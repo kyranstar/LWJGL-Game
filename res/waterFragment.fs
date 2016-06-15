@@ -36,8 +36,11 @@ uniform float reflectance;
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
 uniform DirectionalLight directionalLight;
 uniform mat4 modelViewMatrix;
+uniform float zNear;
+uniform float zFar;
 uniform sampler2D refractTex;
 uniform sampler2D reflectTex;
+uniform sampler2D depthTex;
 
 vec4 calcLightColour(vec3 light_colour, float light_intensity, vec3 position, vec3 to_light_dir, vec3 normal)
 {
@@ -84,6 +87,13 @@ void main()
 	vec2 ndc = (clipSpace.xy/clipSpace.w)/2 + 0.5;
 	vec2 reflectCoord = vec2(ndc.x, -ndc.y);
 	
+	float depth = texture(depthTex, ndc).r;
+	float floorDistance = 2 * zNear * zFar / (zFar + zNear - (2 * depth - 1) * (zFar - zNear));
+	depth = gl_FragCoord.z;
+	float waterDistance =  2 * zNear * zFar / (zFar + zNear - (2 * depth - 1) * (zFar - zNear));
+	float waterDepth = floorDistance - waterDistance;
+	
+	
 	vec4 reflectColor = texture(reflectTex, reflectCoord);
 	vec4 refractColor = texture(refractTex, ndc);
     vec4 baseColour = mix(refractColor, reflectColor, 0.5);
@@ -99,5 +109,6 @@ void main()
    	totalLight += calcDirectionalLight(directionalLight, mvVertexPos, normal); 
 
     fragColor = baseColour * totalLight;
+    fragColor.a = clamp(waterDepth*22,0,1);
 }
 	

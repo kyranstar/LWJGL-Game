@@ -22,6 +22,9 @@ public class WaterShader extends ShaderProgram {
 		createUniform("time");
 		createUniform("refractTex");
 		createUniform("reflectTex");
+		createUniform("depthTex");
+		createUniform("zNear");
+		createUniform("zFar");
 	}
 
 }

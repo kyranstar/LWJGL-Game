@@ -78,6 +78,7 @@ public class Renderer {
 		GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 
+
 		Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(),
 				Z_NEAR, Z_FAR);
 
@@ -112,16 +113,25 @@ public class Renderer {
 		}
 		fbos.unbindCurrentFrameBuffer();
 
+		// render game models
+		renderModels(models, pointLights, camera, directionalLight, projectionMatrix, NO_CLIP);
+		
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getRefractionTexture());
 		GL13.glActiveTexture(GL13.GL_TEXTURE1);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getReflectionTexture());
-
+		GL13.glActiveTexture(GL13.GL_TEXTURE2);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getRefractionDepthTexture());
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		// render water
 		waterShader.bind();
+		waterShader.setUniform("zNear", Z_NEAR);
+		waterShader.setUniform("zFar", Z_FAR);
 		waterShader.setUniform("refractTex", 0);
 		waterShader.setUniform("reflectTex", 1);
+		waterShader.setUniform("depthTex", 2);
 		waterShader.setUniform("projectionMatrix", projectionMatrix);
 		waterShader.setUniform("modelViewMatrix",
 				transformation.getModelViewMatrix(water, transformation.getViewMatrix(camera)));
@@ -129,10 +139,8 @@ public class Renderer {
 		waterShader.setUniform("time", time);
 		renderLights(waterShader, camera, pointLights, directionalLight);
 		water.getMesh().render();
+		GL11.glDisable(GL11.GL_BLEND);
 		waterShader.unbind();
-
-		// render game models
-		renderModels(models, pointLights, camera, directionalLight, projectionMatrix, NO_CLIP);
 
 	}
 
