@@ -73,7 +73,7 @@ public class Renderer {
 			window.setResized(false);
 		}
 
-		window.setClearColor(.6f, .6f, .6f, 0.0f);
+		window.setClearColor(0f, .47f, .674f, 0.0f);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);

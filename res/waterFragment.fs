@@ -3,6 +3,7 @@
 in vec3 exColor;
 in vec3 mvVertexPos;
 in vec4 clipSpace;
+in vec3 toCamera;
 
 out vec4 fragColor;
 
@@ -82,6 +83,12 @@ vec4 calcDirectionalLight(DirectionalLight light, vec3 position, vec3 normal)
 
 void main()
 {
+	const float murkiness = 1.1;
+	// higher is more transparent water
+	const float fresnelCoef = 2;
+	
+	const float edgeSoftness = 22;
+
 	vec3 normal = normalize(cross(dFdx(mvVertexPos), dFdy(mvVertexPos)));
 	
 	vec2 ndc = (clipSpace.xy/clipSpace.w)/2 + 0.5;
@@ -93,10 +100,13 @@ void main()
 	float waterDistance =  2 * zNear * zFar / (zFar + zNear - (2 * depth - 1) * (zFar - zNear));
 	float waterDepth = floorDistance - waterDistance;
 	
-	
 	vec4 reflectColor = texture(reflectTex, reflectCoord);
 	vec4 refractColor = texture(refractTex, ndc);
-    vec4 baseColour = mix(refractColor, reflectColor, 0.5);
+	refractColor = mix(refractColor, vec4(exColor,1), clamp(waterDepth*murkiness, 0.0, 1.0));
+	
+	float refractionFactor = dot(toCamera, normal);
+	
+    vec4 baseColour = mix(refractColor, reflectColor, clamp(1-(refractionFactor*fresnelCoef),0,1));
 
     vec4 totalLight = vec4(ambientLight, 1.0);
     for (int i = 0; i < MAX_POINT_LIGHTS; i++)
@@ -109,6 +119,6 @@ void main()
    	totalLight += calcDirectionalLight(directionalLight, mvVertexPos, normal); 
 
     fragColor = baseColour * totalLight;
-    fragColor.a = clamp(waterDepth*22,0,1);
+    fragColor.a = clamp(waterDepth*edgeSoftness, 0, 1);
 }
 	

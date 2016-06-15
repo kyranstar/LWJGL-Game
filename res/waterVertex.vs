@@ -11,6 +11,7 @@ uniform float time;
 out vec3 exColor;
 out vec3 mvVertexPos;
 out vec4 clipSpace;
+out vec3 toCamera;
 
 #define M_2PI 6.283185307179586476925286766559
 
@@ -33,5 +34,6 @@ void main()
     gl_Position =  clipSpace;
     mvVertexPos = mvPos.xyz;
     exColor = inColor;
+    toCamera = normalize(vec3(0,0,0) - mvPos.xyz);
 }
 
