@@ -17,7 +17,7 @@ import hu.kazocsaba.v3d.mesh.format.ply.PlyReader;
 public class DummyGame implements IGameLogic {
 	private static final float CAMERA_POS_STEP = 0.05f;
 	private static final float MOUSE_SENSITIVITY = 0.4f;
-	Camera camera = new Camera(new Vector3f(0,3,0), new Vector3f());
+	Camera camera = new Camera(new Vector3f(0, 3, 0), new Vector3f());
 	Vector3f cameraInc = new Vector3f();
 	Renderer renderer = new Renderer();
 	private GameModel[] models;
@@ -51,15 +51,15 @@ public class DummyGame implements IGameLogic {
 		GameModel torus = new GameModel(new PlyReader("/untitled.ply").readMesh(), 1);
 		torus.setScale(.1f);
 		torus.setPosition(0, 3f, 0);
-		heightmap = new HeightMap(0, .25f, .5f, 40, 40, 100);
+		heightmap = new HeightMap(-.1f, .15f, .5f, 60, 100);
 		heightmap.setScale(10);
 		models = new GameModel[] { torus };
 
-		waterMesh = new WaterModel(40, 40, .1f);
-		waterMesh.setScale(10);
+		waterMesh = new WaterModel(80, 80, 0f);
+		waterMesh.setScale(15);
 
 		lights = new PointLight[] {
-				new PointLight(new Vector3f(0, 1, 0), new Vector3f(0, 3f, 0), 2, new Attenuation(1, 1, 1)) };
+				new PointLight(new Vector3f(1, 1, 1), new Vector3f(0, 3f, 0), 2, new Attenuation(1, 1, 1)) };
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public class DummyGame implements IGameLogic {
 	@Override
 	public void update(float dt) {
 		time += dt;
-		//lights[0].setPosition(camera.getPosition());
+		// lights[0].setPosition(camera.getPosition());
 	}
 
 	@Override

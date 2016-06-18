@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjglb.game.engine.Mesh;
 import org.lwjglb.game.engine.utils.SimplexNoise;
@@ -15,25 +16,26 @@ public class HeightMap extends GameModel {
 	private static final float START_Z = -0.5f;
 	private static final float REFLECTANCE = .1f;
 
-	public HeightMap(float minY, float maxY, float persistence, int width, int height, float spikeness) {
-		super(createMesh(minY, maxY, persistence, width, height, spikeness), REFLECTANCE);
+	public HeightMap(float minY, float maxY, float persistence, int radius, float spikeness) {
+		super(createMesh(minY, maxY, persistence, radius, spikeness), REFLECTANCE);
 	}
 
-	protected static Mesh createMesh(final float minY, final float maxY, final float persistence, final int width,
-			final int height, float spikeness) {
+	protected static Mesh createMesh(final float minY, final float maxY, final float persistence, final int radius,
+			float spikeness) {
 		SimplexNoise noise = new SimplexNoise(128, persistence, 2);// Utils.getRandom().nextInt());
 
-		float xStep = Math.abs(START_X * 2) / (width - 1);
-		float zStep = Math.abs(START_Z * 2) / (height - 1);
+		float xStep = Math.abs(START_X * 2) / (radius * 2 - 1);
+		float zStep = Math.abs(START_Z * 2) / (radius * 2 - 1);
 
 		List<Float> positions = new ArrayList<>();
 		List<Integer> indices = new ArrayList<>();
 
-		for (int z = 0; z < height; z++) {
-			for (int x = 0; x < width; x++) {
+		for (int z = 0; z < radius * 2; z++) {
+			for (int x = 0; x < radius * 2; x++) {
 				// scale from [-1, 1] to [minY, maxY]
 				float heightY = (float) ((noise.getNoise(x * xStep * spikeness, z * zStep * spikeness) + 1f) / 2
 						* (maxY - minY) + minY);
+				heightY = createCircle(heightY, ((float) x / radius) - 1, ((float) z / radius) - 1);
 
 				positions.add(START_X + x * xStep);
 				positions.add(heightY);
@@ -43,12 +45,12 @@ public class HeightMap extends GameModel {
 				positions.add(START_Z + z * zStep);
 			}
 		}
-		for (int z = 0; z < height - 1; z++) {
-			for (int x = 0; x < width - 1; x++) {
-				int leftTop = z * width + x;
-				int leftBottom = (z + 1) * width + x;
-				int rightBottom = (z + 1) * width + x + 1;
-				int rightTop = z * width + x + 1;
+		for (int z = 0; z < radius * 2 - 1; z++) {
+			for (int x = 0; x < radius * 2 - 1; x++) {
+				int leftTop = z * radius * 2 + x;
+				int leftBottom = (z + 1) * radius * 2 + x;
+				int rightBottom = (z + 1) * radius * 2 + x + 1;
+				int rightTop = z * radius * 2 + x + 1;
 
 				indices.add(2 * leftTop);
 				indices.add(2 * leftBottom);
@@ -71,9 +73,28 @@ public class HeightMap extends GameModel {
 		}
 		int[] indicesArr = indices.stream().mapToInt((i) -> i).toArray();
 
-		float[] normalArr = calcNormals(verticesArr, width, height);
+		float[] normalArr = calcNormals(verticesArr, radius * 2, radius * 2);
 
 		return new Mesh(verticesArr, colorArr, normalArr, indicesArr);
+	}
+
+	/**
+	 * Attenuates heights as they approach the edge
+	 * 
+	 * @param heightY
+	 * @param x
+	 *            [-1, 1]
+	 * @param z
+	 *            [-1, 1]
+	 * @return
+	 */
+	private static float createCircle(float heightY, float x, float z) {
+		float dist = new Vector2f(x, z).length();
+		float attenuationDistance = 0.65f;
+		if (dist > attenuationDistance) {
+			heightY -= (dist - attenuationDistance) * (.45f * dist);
+		}
+		return heightY;
 	}
 
 	private static float[] calcNormals(float[] posArr, int width, int height) {

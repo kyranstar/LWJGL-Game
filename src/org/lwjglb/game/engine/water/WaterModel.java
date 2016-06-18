@@ -3,21 +3,22 @@ package org.lwjglb.game.engine.water;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joml.Vector2f;
 import org.lwjglb.game.GameModel;
 import org.lwjglb.game.engine.Mesh;
 import org.lwjglb.game.engine.utils.Utils;
 
-public class WaterModel extends GameModel{
+public class WaterModel extends GameModel {
 	private static final float START_X = -0.5f;
 	private static final float START_Z = -0.5f;
 	private static final float REFLECTANCE = 0.8f;
-	
+
 	private final float height;
 
 	public WaterModel(int vertX, int vertY, float height) {
 		super(generateMesh(vertX, vertY, height), REFLECTANCE);
 		this.height = height;
-		
+
 	}
 
 	private static Mesh generateMesh(int vertX, int vertY, float height) {
@@ -29,7 +30,6 @@ public class WaterModel extends GameModel{
 
 		for (int y = 0; y < vertY; y++) {
 			for (int x = 0; x < vertX; x++) {
-				// scale from [-1, 1] to [minY, maxY]
 
 				vertList.add(START_X + x * xStep);
 				vertList.add(height);
@@ -42,13 +42,17 @@ public class WaterModel extends GameModel{
 					int rightBottom = (y + 1) * vertX + x + 1;
 					int rightTop = y * vertX + x + 1;
 
-					indList.add(leftTop);
-					indList.add(leftBottom);
-					indList.add(rightTop);
+					float dist = new Vector2f(START_X + x * xStep, START_Z + y * zStep).length();
 
-					indList.add(rightTop);
-					indList.add(leftBottom);
-					indList.add(rightBottom);
+					if (dist < .45) {
+						indList.add(leftTop);
+						indList.add(leftBottom);
+						indList.add(rightTop);
+
+						indList.add(rightTop);
+						indList.add(leftBottom);
+						indList.add(rightBottom);
+					}
 				}
 			}
 		}
@@ -58,7 +62,7 @@ public class WaterModel extends GameModel{
 			colors[i + 1] = 174 / 255f;
 			colors[i + 2] = 255 / 255f;
 		}
-		return new Mesh(Utils.listToArray(vertList), indList.stream().mapToInt((i)->i).toArray(), colors);
+		return new Mesh(Utils.listToArray(vertList), indList.stream().mapToInt((i) -> i).toArray(), colors);
 
 	}
 
