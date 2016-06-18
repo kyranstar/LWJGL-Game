@@ -115,15 +115,11 @@ public class Mesh {
 		GL30.glBindVertexArray(getVaoId());
 		GL20.glEnableVertexAttribArray(0);
 		GL20.glEnableVertexAttribArray(1);
-		if (normalVboId != -1) {
-			GL20.glEnableVertexAttribArray(2);
-		}
+		GL20.glEnableVertexAttribArray(2);
 
 		GL11.glDrawElements(GL11.GL_TRIANGLES, indexCount, GL11.GL_UNSIGNED_INT, 0);
-		
-		if (normalVboId != -1) {
-			GL20.glDisableVertexAttribArray(0);
-		}
+
+		GL20.glDisableVertexAttribArray(0);
 		GL20.glDisableVertexAttribArray(1);
 		GL20.glDisableVertexAttribArray(2);
 		GL30.glBindVertexArray(0);

@@ -38,27 +38,30 @@ public class HeightMap extends GameModel {
 				positions.add(START_X + x * xStep);
 				positions.add(heightY);
 				positions.add(START_Z + z * zStep);
+				positions.add(START_X + x * xStep);
+				positions.add(heightY);
+				positions.add(START_Z + z * zStep);
+			}
+		}
+		for (int z = 0; z < height - 1; z++) {
+			for (int x = 0; x < width - 1; x++) {
+				int leftTop = z * width + x;
+				int leftBottom = (z + 1) * width + x;
+				int rightBottom = (z + 1) * width + x + 1;
+				int rightTop = z * width + x + 1;
 
-				// Create indices
-				if (x < width - 1 && z < height - 1) {
-					int leftTop = z * width + x;
-					int leftBottom = (z + 1) * width + x;
-					int rightBottom = (z + 1) * width + x + 1;
-					int rightTop = z * width + x + 1;
+				indices.add(2 * leftTop);
+				indices.add(2 * leftBottom);
+				indices.add(2 * rightTop);
 
-					indices.add(leftTop);
-					indices.add(leftBottom);
-					indices.add(rightTop);
-
-					indices.add(rightTop);
-					indices.add(leftBottom);
-					indices.add(rightBottom);
-				}
+				indices.add(2 * rightTop + 1);
+				indices.add(2 * leftBottom + 1);
+				indices.add(2 * rightBottom + 1);
 			}
 		}
 
 		float[] verticesArr = Utils.listToArray(positions);
-		Color c = new Color(147, 105, 59);
+		Color c = new Color(235, 192, 149);
 		float[] colorArr = new float[positions.size()];
 		for (int i = 0; i < colorArr.length; i += 3) {
 			float brightness = (Utils.getRandom().nextFloat() - 0.5f) * 0.5f;
