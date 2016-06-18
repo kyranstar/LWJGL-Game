@@ -10,7 +10,7 @@ uniform mat4 modelMatrix;
 uniform mat4 modelViewMatrix;
 uniform vec4 clipPlane;
 
-flat out vec3 exColor;
+out vec3 exColor;
 out vec3 mvVertexNormal;
 out vec3 mvVertexPos;
 

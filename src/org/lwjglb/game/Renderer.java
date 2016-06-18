@@ -14,6 +14,7 @@ import org.lwjgl.opengl.GL31;
 import org.lwjgl.opengl.GL32;
 import org.lwjglb.game.engine.Camera;
 import org.lwjglb.game.engine.ShaderProgram;
+import org.lwjglb.game.engine.TerrainShader;
 import org.lwjglb.game.engine.Transformation;
 import org.lwjglb.game.engine.Window;
 import org.lwjglb.game.engine.lighting.DirectionalLight;
@@ -44,6 +45,8 @@ public class Renderer {
 
 	ShaderProgram shader;
 
+	ShaderProgram terrainShader;
+
 	WaterShader waterShader;
 
 	WaterFrameBuffers fbos;
@@ -61,6 +64,7 @@ public class Renderer {
 			shader.createDirectionalLightUniform("directionalLight");
 			shader.createUniform("clipPlane");
 
+			terrainShader = new TerrainShader(MAX_POINT_LIGHTS);
 			waterShader = new WaterShader(MAX_POINT_LIGHTS);
 
 			fbos = new WaterFrameBuffers(window);
@@ -71,8 +75,8 @@ public class Renderer {
 
 	}
 
-	public void render(Window window, float time, WaterModel water, GameModel[] models, PointLight[] pointLights,
-			Camera camera, DirectionalLight directionalLight) {
+	public void render(Window window, float time, WaterModel water, HeightMap heightmap, GameModel[] models,
+			PointLight[] pointLights, Camera camera, DirectionalLight directionalLight) {
 		if (window.isResized()) {
 			GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
 
@@ -83,7 +87,6 @@ public class Renderer {
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-
 
 		Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(),
 				Z_NEAR, Z_FAR);
@@ -96,7 +99,7 @@ public class Renderer {
 
 			// render game models
 			float maxWaterHeight = water.getHeight() + WaterShader.MAX_HEIGHT_DIF * water.getScale();
-			renderModels(models, pointLights, camera, directionalLight, projectionMatrix,
+			renderModels(models,heightmap, pointLights, camera, directionalLight, projectionMatrix,
 					new Vector4f(0, -1, 0, maxWaterHeight));
 
 		}
@@ -107,21 +110,22 @@ public class Renderer {
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 
 			float dist = 2 * (camera.getPosition().y - water.getHeight());
-			
-			Camera reflectionCamera = new Camera(new Vector3f(camera.getPosition()), new Vector3f(camera.getRotation()));
+
+			Camera reflectionCamera = new Camera(new Vector3f(camera.getPosition()),
+					new Vector3f(camera.getRotation()));
 			reflectionCamera.movePosition(0, -dist, 0);
 			reflectionCamera.getRotation().x = -reflectionCamera.getRotation().x;
 
 			// render game models
 			float minWaterHeight = water.getHeight() - WaterShader.MAX_HEIGHT_DIF * water.getScale();
-			renderModels(models, pointLights, reflectionCamera, directionalLight, projectionMatrix,
+			renderModels(models,heightmap, pointLights, reflectionCamera, directionalLight, projectionMatrix,
 					new Vector4f(0, 1, 0, -minWaterHeight));
 		}
 		fbos.unbindCurrentFrameBuffer();
 
 		// render game models
-		renderModels(models, pointLights, camera, directionalLight, projectionMatrix, NO_CLIP);
-		
+		renderModels(models,heightmap, pointLights, camera, directionalLight, projectionMatrix, NO_CLIP);
+
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getRefractionTexture());
@@ -150,7 +154,7 @@ public class Renderer {
 
 	}
 
-	private void renderModels(GameModel[] models, PointLight[] pointLights, Camera camera,
+	private void renderModels(GameModel[] models, HeightMap heightmap, PointLight[] pointLights, Camera camera,
 			DirectionalLight directionalLight, Matrix4f projectionMatrix, Vector4f clipPlane) {
 		shader.bind();
 		shader.setUniform("projectionMatrix", projectionMatrix);
@@ -164,6 +168,18 @@ public class Renderer {
 			models[i].getMesh().render();
 		}
 		shader.unbind();
+
+		// draw terrain
+		terrainShader.bind();
+		terrainShader.setUniform("projectionMatrix", projectionMatrix);
+		renderLights(terrainShader, camera, pointLights, directionalLight);
+		terrainShader.setUniform("clipPlane", clipPlane);
+		terrainShader.setUniform("reflectance", heightmap.getReflectance());
+		terrainShader.setUniform("modelMatrix", transformation.getModelMatrix(heightmap));
+		terrainShader.setUniform("modelViewMatrix",
+				transformation.getModelViewMatrix(heightmap, transformation.getViewMatrix(camera)));
+		heightmap.getMesh().render();
+		terrainShader.unbind();
 	}
 
 	private void renderLights(ShaderProgram shader, Camera camera, PointLight[] pointLightList,

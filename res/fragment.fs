@@ -1,6 +1,6 @@
 #version 330
 
-flat in vec3 exColor;
+in vec3 exColor;
 in vec3 mvVertexNormal;
 in vec3 mvVertexPos;
 

@@ -25,6 +25,7 @@ public class DummyGame implements IGameLogic {
 	private DirectionalLight directionalLight = new DirectionalLight(new Vector3f(0, 1, 0), new Vector3f(1, 1, 1), 0f);
 	private WaterModel waterMesh;
 	private float time;
+	private HeightMap heightmap;
 
 	@Override
 	public void init(Window window) throws Exception {
@@ -50,9 +51,9 @@ public class DummyGame implements IGameLogic {
 		GameModel torus = new GameModel(new PlyReader("/untitled.ply").readMesh(), 1);
 		torus.setScale(.1f);
 		torus.setPosition(0, 3f, 0);
-		GameModel heightmap = new HeightMap(0, .25f, .5f, 40, 40, 100);
+		heightmap = new HeightMap(0, .25f, .5f, 40, 40, 100);
 		heightmap.setScale(10);
-		models = new GameModel[] { torus, heightmap };
+		models = new GameModel[] { torus };
 
 		waterMesh = new WaterModel(40, 40, .1f);
 		waterMesh.setScale(10);
@@ -98,7 +99,7 @@ public class DummyGame implements IGameLogic {
 
 	@Override
 	public void render(Window window) {
-		renderer.render(window, time, waterMesh, models, lights, camera, directionalLight);
+		renderer.render(window, time, waterMesh, heightmap, models, lights, camera, directionalLight);
 	}
 
 	@Override
