@@ -92,32 +92,32 @@ public class HeightMap extends GameModel {
 			for (int col = 0; col < width; col++) {
 				if (row > 0 && row < height - 1 && col > 0 && col < width - 1) {
 					int i0 = row * width * 3 + col * 3;
-					v0.x = posArr[i0];
-					v0.y = posArr[i0 + 1];
-					v0.z = posArr[i0 + 2];
+					v0.x = posArr[2 * i0];
+					v0.y = posArr[2 * i0 + 1];
+					v0.z = posArr[2 * i0 + 2];
 
 					int i1 = row * width * 3 + (col - 1) * 3;
-					v1.x = posArr[i1];
-					v1.y = posArr[i1 + 1];
-					v1.z = posArr[i1 + 2];
+					v1.x = posArr[2 * (i1)];
+					v1.y = posArr[2 * i1 + 1];
+					v1.z = posArr[2 * i1 + 2];
 					v1 = v1.sub(v0);
 
 					int i2 = (row + 1) * width * 3 + col * 3;
-					v2.x = posArr[i2];
-					v2.y = posArr[i2 + 1];
-					v2.z = posArr[i2 + 2];
+					v2.x = posArr[2 * (i2)];
+					v2.y = posArr[2 * i2 + 1];
+					v2.z = posArr[2 * i2 + 2];
 					v2 = v2.sub(v0);
 
 					int i3 = (row) * width * 3 + (col + 1) * 3;
-					v3.x = posArr[i3];
-					v3.y = posArr[i3 + 1];
-					v3.z = posArr[i3 + 2];
+					v3.x = posArr[2 * i3];
+					v3.y = posArr[2 * i3 + 1];
+					v3.z = posArr[2 * i3 + 2];
 					v3 = v3.sub(v0);
 
 					int i4 = (row - 1) * width * 3 + col * 3;
-					v4.x = posArr[i4];
-					v4.y = posArr[i4 + 1];
-					v4.z = posArr[i4 + 2];
+					v4.x = posArr[2 * i4];
+					v4.y = posArr[2 * i4 + 1];
+					v4.z = posArr[2 * i4 + 2];
 					v4 = v4.sub(v0);
 
 					v1.cross(v2, v12);
@@ -140,9 +140,11 @@ public class HeightMap extends GameModel {
 					normal.z = 0;
 				}
 				normal.normalize();
-				normals.add(normal.x);
-				normals.add(normal.y);
-				normals.add(normal.z);
+				for (int i = 0; i < 2; i++) {
+					normals.add(normal.x);
+					normals.add(normal.y);
+					normals.add(normal.z);
+				}
 			}
 		}
 		return Utils.listToArray(normals);

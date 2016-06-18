@@ -22,7 +22,7 @@ public class DummyGame implements IGameLogic {
 	Renderer renderer = new Renderer();
 	private GameModel[] models;
 	private PointLight[] lights;
-	private DirectionalLight directionalLight = new DirectionalLight(new Vector3f(0, 1, 0), new Vector3f(1, 1, 1), 0f);
+	private DirectionalLight directionalLight = new DirectionalLight(new Vector3f(1, 1, 1), new Vector3f(1, 1, 1), .5f);
 	private WaterModel waterMesh;
 	private float time;
 	private HeightMap heightmap;
@@ -59,7 +59,7 @@ public class DummyGame implements IGameLogic {
 		waterMesh.setScale(10);
 
 		lights = new PointLight[] {
-				new PointLight(new Vector3f(1, 1, 1), new Vector3f(0, 3f, 0), 5, new Attenuation(1, 1, 1)) };
+				new PointLight(new Vector3f(0, 1, 0), new Vector3f(0, 3f, 0), 2, new Attenuation(1, 1, 1)) };
 	}
 
 	@Override
