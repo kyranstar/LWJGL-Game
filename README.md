@@ -6,4 +6,6 @@
   - [ ] Implement refraction based on water normals (cubemap necessary?)
   - [ ] Cull parts of terrain not seen
   - [ ] Create good looking sky with sun
-  
+  - [ ] Entity component system
+  - [ ] Entity/Heightmap collision
+  - [ ] Text rendering 
